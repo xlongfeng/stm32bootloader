@@ -144,35 +144,49 @@ void Bootloader::run()
     }
     qDebug() << "Chip ID:" << chipId << ", Density:" << density;
 
-    writeCmd(EraseMemoryCommand);
-    checkWaitForAck("Erase memory command");
-    writeCmd(0xff);
-    checkWaitForAckMsecs("Erase memory command", 2000);
+    QFile file("C:/Users/cnh75547/Workspace/homesecurity/Objects/homesecurity.bin");
+    ret = file.open(QIODevice::ReadOnly);
+    const QByteArray &bin = file.readAll();
+    file.close();
 
-    QFile bin("C:/Users/cnh75547/Workspace/homesecurity/Objects/homesecurity.bin");
-    ret = bin.open(QIODevice::ReadOnly);
-    int fileSize = bin.size();
-    int filePos = 0;
-    qDebug() << "bin filesize:" << fileSize << ret;
+    int binSize = bin.size();
+    int binPos = 0;
+    qDebug() << "bin size:" << binSize << ret;
+
     if (!ret)
         return;
 
+    writeCmd(EraseMemoryCommand);
+    checkWaitForAck("Erase memory command");
+#if 0
+    writeCmd(0xff);
+    qDebug() << "Erase all of pages";
+#else
+    int numOfPages = (binSize + density - 1) / density;
+    QByteArray pages;
+    for (int i = 0; i < numOfPages; i++) {
+        pages.append(i);
+    }
+    writeData(pages);
+    qDebug() << "Erase num of pages:" << numOfPages;
+#endif
+    checkWaitForAckMsecs("Erase memory command", 2000);
+
     do {
-        int bytes = fileSize - filePos;
+        int bytes = binSize - binPos;
         bytes = bytes > 256 ? 256 : bytes;
         bytes = ((bytes + 3) / 4) * 4;
-        QByteArray fileBuf(256, 0xff);
-        bin.seek(filePos);
-        bin.read(fileBuf.data(), bytes);
+        QByteArray buf(256, 0xff);
+        buf.replace(0, bytes, bin.mid(binPos, bytes));
         writeCmd(WriteMemoryCommand);
         checkWaitForAck("Write memory command");
-        writeAddr(FlashBaseAddress + filePos);
+        writeAddr(FlashBaseAddress + binPos);
         checkWaitForAck("Write memory command");
-        writeData(fileBuf);
+        writeData(buf);
         checkWaitForAckMsecs("Write memory command", 2000);
-        filePos += bytes;
-        qDebug() << "file pos:" << filePos;
-    } while (filePos < fileSize);
+        binPos += bytes;
+        qDebug() << "bin pos:" << binPos;
+    } while (binPos < binSize);
 
     bootModeExit();
 
