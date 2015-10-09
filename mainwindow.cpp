@@ -164,6 +164,8 @@ void MainWindow::loadExit()
     ui->progressBar->setVisible(false);
     ui->openPushButton->setEnabled(true);
     openSerial(portName(), baudrate());
+    resetEnterAction();
+    QTimer::singleShot(50, this, SLOT(resetExitAction()));
 }
 
 void MainWindow::loadProgress(int value)

@@ -97,6 +97,7 @@ void Bootloader::bootModeExit()
 {
     if (serialPort) {
         if (serialPort->isOpen()) {
+#if 0
             serialPort->flush();
             serialPort->setDataTerminalReady(false);
             serialPort->setRequestToSend(true);
@@ -104,6 +105,7 @@ void Bootloader::bootModeExit()
             serialPort->readAll();
             serialPort->setRequestToSend(false);
             msleep(10);
+#endif
             serialPort->close();
         }
         delete serialPort;
