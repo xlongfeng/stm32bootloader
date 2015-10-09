@@ -14,9 +14,11 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    bootloader.cpp
+    bootloader.cpp \
+    settings.cpp
 
 HEADERS  += mainwindow.h \
-    bootloader.h
+    bootloader.h \
+    settings.h
 
 FORMS    += mainwindow.ui

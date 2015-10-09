@@ -19,14 +19,24 @@
  *
  */
 
-#include "mainwindow.h"
-#include <QApplication>
+#ifndef SETTINGS_H
+#define SETTINGS_H
 
-int main(int argc, char *argv[])
+#include <QSettings>
+
+class Settings : public QSettings
 {
-    QApplication a(argc, argv);
-    MainWindow w;
-    w.show();
+    Q_OBJECT
+public:
+    explicit Settings(const QString &filename, Format format = IniFormat, QObject *parent = 0);
 
-    return a.exec();
-}
+    static Settings *instance();
+
+private:
+    Q_DISPLAY_COPY(Settings);
+
+private:
+    static Settings *self;
+};
+
+#endif // SETTINGS_H
