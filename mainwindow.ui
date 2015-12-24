@@ -17,41 +17,35 @@
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="0" column="0">
-       <widget class="QLabel" name="label">
+      <item row="1" column="6">
+       <widget class="QPushButton" name="openPushButton">
         <property name="text">
-         <string>Port</string>
+         <string>Open</string>
         </property>
        </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QComboBox" name="portComboBox"/>
       </item>
       <item row="0" column="6">
-       <widget class="QPushButton" name="resetPushButton">
+       <widget class="QPushButton" name="clearPushButton">
         <property name="text">
-         <string>Reset</string>
+         <string>Clear</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="2">
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>Baudrate</string>
+      <item row="1" column="1" colspan="5">
+       <widget class="QLineEdit" name="binLineEdit">
+        <property name="readOnly">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
-      <item row="0" column="3">
-       <widget class="QComboBox" name="baudrateComboBox"/>
-      </item>
-      <item row="1" column="6">
-       <widget class="QPushButton" name="loadPushButton">
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_3">
         <property name="text">
-         <string>Download</string>
+         <string>File</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="4">
+      <item row="0" column="5">
        <spacer name="horizontalSpacer">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -64,31 +58,44 @@
         </property>
        </spacer>
       </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_3">
+      <item row="1" column="7">
+       <widget class="QPushButton" name="loadPushButton">
         <property name="text">
-         <string>File</string>
+         <string>Download</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="1" colspan="4">
-       <widget class="QLineEdit" name="binLineEdit">
-        <property name="readOnly">
-         <bool>true</bool>
+      <item row="0" column="3">
+       <widget class="QComboBox" name="baudrateComboBox"/>
+      </item>
+      <item row="0" column="2">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Baudrate</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="5">
-       <widget class="QPushButton" name="clearPushButton">
+      <item row="0" column="7">
+       <widget class="QPushButton" name="resetPushButton">
         <property name="text">
-         <string>Clear</string>
+         <string>Reset</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="5">
-       <widget class="QPushButton" name="openPushButton">
+      <item row="0" column="1">
+       <widget class="QComboBox" name="portComboBox"/>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label">
         <property name="text">
-         <string>Open</string>
+         <string>Port</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="4">
+       <widget class="QPushButton" name="suspendPushButton">
+        <property name="text">
+         <string>Suspend</string>
         </property>
        </widget>
       </item>
@@ -102,7 +109,7 @@
      </widget>
     </item>
     <item>
-     <widget class="QPlainTextEdit" name="plainTextEdit">
+     <widget class="ConsoleScreen" name="textEdit">
       <property name="readOnly">
        <bool>true</bool>
       </property>
@@ -131,12 +138,19 @@
   <widget class="QStatusBar" name="statusBar"/>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>ConsoleScreen</class>
+   <extends>QPlainTextEdit</extends>
+   <header>consolescreen.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>
    <sender>clearPushButton</sender>
    <signal>clicked()</signal>
-   <receiver>plainTextEdit</receiver>
+   <receiver>textEdit</receiver>
    <slot>clear()</slot>
    <hints>
     <hint type="sourcelabel">

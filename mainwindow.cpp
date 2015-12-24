@@ -34,6 +34,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     serialPort(new QSerialPort),
+    suspend(false),
     timer(new QTimer),
     bootloader(new Bootloader)
 {
@@ -41,10 +42,12 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->progressBar->setVisible(false);
     connect(ui->portComboBox, SIGNAL(activated(QString)), this, SLOT(portChanged(QString)));
     connect(ui->baudrateComboBox, SIGNAL(activated(QString)), this, SLOT(baudrateChanged(QString)));
+    connect(ui->suspendPushButton, SIGNAL(pressed()), this, SLOT(suspendSerial()));
     connect(ui->resetPushButton, SIGNAL(pressed()), this, SLOT(resetEnterAction()));
     connect(ui->resetPushButton, SIGNAL(released()), this, SLOT(resetExitAction()));
     connect(ui->openPushButton, SIGNAL(pressed()), this, SLOT(openAction()));
     connect(ui->loadPushButton, SIGNAL(pressed()), this, SLOT(loadAction()));
+    connect(ui->textEdit, SIGNAL(keyPress(int)), this, SLOT(writeSerial(int)));
 
     QListIterator<QSerialPortInfo> portinfos(QSerialPortInfo::availablePorts());
     while (portinfos.hasNext()) {
@@ -84,6 +87,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(bootloader, SIGNAL(progressValue(int)), this, SLOT(loadProgress(int)));
 
     openSerial(portName(), baudrate);
+
+    ui->textEdit->setFocus();
 }
 
 MainWindow::~MainWindow()
@@ -106,12 +111,41 @@ void MainWindow::baudrateChanged(const QString &text)
     Settings::instance()->setValue("Baudrate", text);
 }
 
+void MainWindow::suspendSerial()
+{
+    suspend = !suspend;
+    if (suspend)
+        ui->suspendPushButton->setText(tr("Resume"));
+    else
+        ui->suspendPushButton->setText(tr("Suspend"));
+}
+
 void MainWindow::readSerial()
 {
     if (serialPort->isOpen() && serialPort->bytesAvailable()) {
-        ui->plainTextEdit->moveCursor(QTextCursor::End);
-        ui->plainTextEdit->insertPlainText(serialPort->readAll());
-        ui->plainTextEdit->moveCursor(QTextCursor::End);
+        if (!suspend) {
+            ui->textEdit->moveCursor(QTextCursor::End);
+            ui->textEdit->insertPlainText(serialPort->readAll());
+            ui->textEdit->moveCursor(QTextCursor::End);
+        } else {
+            serialPort->readAll();
+        }
+    }
+}
+
+void MainWindow::writeSerial(int key)
+{
+    if (serialPort->isOpen()) {
+        QByteArray data;
+        data.append(key);
+        serialPort->write(data);
+    }
+}
+
+void MainWindow::writeSerial(const QString &data)
+{
+    if (serialPort->isOpen()) {
+        serialPort->write(data.toLatin1());
     }
 }
 
@@ -144,6 +178,7 @@ void MainWindow::loadAction()
 {
     closeSerial();
     ui->openPushButton->setDisabled(true);
+    ui->loadPushButton->setDisabled(true);
     bootloader->setPortName(portName());
     bootloader->setBaudrate(baudrate());
     bootloader->setFilename(filename());
@@ -163,6 +198,7 @@ void MainWindow::loadExit()
 {
     ui->progressBar->setVisible(false);
     ui->openPushButton->setEnabled(true);
+    ui->loadPushButton->setEnabled(true);
     openSerial(portName(), baudrate());
     resetEnterAction();
     QTimer::singleShot(50, this, SLOT(resetExitAction()));
@@ -206,7 +242,7 @@ void MainWindow::openSerial(const QString &port, qint32 baudrate)
     serialPort->setDataTerminalReady(false);
     serialPort->setRequestToSend(false);
 
-    timer->start(1000);
+    timer->start(50);
 
     qDebug() << "serialPort open:" << port << baudrate;
 }

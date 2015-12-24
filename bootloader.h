@@ -74,7 +74,7 @@ private:
     qint64 writeBytesRead(char size);
     qint64 writeData(const QByteArray &data);
     bool waitForRead(int msec);
-    bool waitForAck(int msec = 10);
+    bool waitForAck(int msec = 50);
     bool autoBaudrateSeq();
 
 private:

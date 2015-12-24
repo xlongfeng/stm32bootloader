@@ -43,7 +43,10 @@ public:
 public Q_SLOTS:
     void portChanged(const QString &text);
     void baudrateChanged(const QString &text);
+    void suspendSerial();
     void readSerial();
+    void writeSerial(int key);
+    void writeSerial(const QString &data);
     void resetEnterAction();
     void resetExitAction();
     void openAction();
@@ -62,6 +65,7 @@ private:
 private:
     Ui::MainWindow *ui;
     QSerialPort *serialPort;
+    bool suspend;
     QTimer *timer;
     Bootloader *bootloader;
 };

@@ -15,10 +15,12 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     bootloader.cpp \
-    settings.cpp
+    settings.cpp \
+    consolescreen.cpp
 
 HEADERS  += mainwindow.h \
     bootloader.h \
-    settings.h
+    settings.h \
+    consolescreen.h
 
 FORMS    += mainwindow.ui
